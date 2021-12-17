@@ -19,7 +19,7 @@ class CreatePostsTable extends Migration
             $table->id();
 
             $table->string('name');
-            $table->string('slug');
+            $table->string('slug')->unique();
 
             $table->text('extract');
             $table->longText('body');
