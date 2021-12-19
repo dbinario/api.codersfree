@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class CategoryController extends Controller
 {
@@ -16,6 +17,10 @@ class CategoryController extends Controller
     public function index()
     {
         //
+        $categories = Category::all();
+        //return response()->json($categories);
+        return $categories;
+
     }
 
     /**
@@ -26,7 +31,24 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        
+        //con esto creamos el slug de manera automatica
+        $request->request->add(['slug'=>Str::slug($request->input('name'))]);
+
+        $request->validate([
+
+            'name' => 'required|max:255',
+            'slug' => 'required|max:255|unique:categories',
+            
+        ]);
+
+        //creamos el registro de categoria
+        $category=Category::create($request->all());
+
+        //return response()->json($category,201);
+        return $category;
+
+
     }
 
     /**
@@ -37,7 +59,8 @@ class CategoryController extends Controller
      */
     public function show(Category $category)
     {
-        //
+        // en caso de encontrar la cqaegoria la regresamos
+            return $category;
     }
 
     /**
