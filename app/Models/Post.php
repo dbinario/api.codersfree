@@ -5,13 +5,25 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+use App\Traits\ApiTrait;
+
 class Post extends Model
 {
-    use HasFactory;
+    use HasFactory,ApiTrait;
 
     //se definen las constantes
     const BORRADOR  = 1;
     const PUBLICADO = 2;
+
+
+    protected $fillable = [
+        'name',
+        'slug',
+        'extract',
+        'body',
+        'category_id',
+        'user_id'
+    ];
 
     //relacion uno a muchos con el modelo User
 

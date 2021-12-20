@@ -7,6 +7,9 @@ use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
+//importamos el recurso
+use App\Http\Resources\CategoryResource;
+
 class CategoryController extends Controller
 {
     /**
@@ -16,10 +19,13 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        //
-        $categories = Category::all();
-        //return response()->json($categories);
-        return $categories;
+        
+        $categories = Category::included()
+                    ->filter()
+                    ->sort()
+                    ->getOrPaginate();
+
+        return CategoryResource::collection($categories);
 
     }
 
@@ -45,8 +51,7 @@ class CategoryController extends Controller
         //creamos el registro de categoria
         $category=Category::create($request->all());
 
-        //return response()->json($category,201);
-        return $category;
+        return CategoryResource::make($category);
 
 
     }
@@ -57,10 +62,13 @@ class CategoryController extends Controller
      * @param  \App\Models\Category  $category
      * @return \Illuminate\Http\Response
      */
-    public function show(Category $category)
-    {
-        // en caso de encontrar la cqaegoria la regresamos
-            return $category;
+    public function show($id)
+    {   
+        //buscamos la categoria por id
+        $category=Category::included()->findOrFail($id);
+
+        // en caso de encontrar la categoria la regresamos
+         return CategoryResource::make($category);
     }
 
     /**
@@ -73,6 +81,22 @@ class CategoryController extends Controller
     public function update(Request $request, Category $category)
     {
         //
+           //con esto creamos el slug de manera automatica
+           $request->request->add(['slug'=>Str::slug($request->input('name'))]);
+
+           $request->validate([
+   
+               'name' => 'required|max:255',
+               'slug' => 'required|max:255|unique:categories,slug,'.$category->id
+               
+           ]);
+   
+           //actualizamos la categoria
+           $category->update($request->all());
+   
+           //return response()->json($category,201);
+           return CategoryResource::make($category);
+   
     }
 
     /**
@@ -83,6 +107,9 @@ class CategoryController extends Controller
      */
     public function destroy(Category $category)
     {
-        //
+        //eliiminamos la categoria
+        $category->delete();
+
+        return CategoryResource::make($category);
     }
 }
