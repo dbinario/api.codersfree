@@ -11,6 +11,12 @@ use App\Http\Resources\PostResource;
 
 class PostController extends Controller
 {
+    public function __construct()
+    {
+        //protegemos el controlador para que solo pueda ser accedido por usuarios autenticados
+        $this->middleware('auth:api')->except(['index','show']);
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -43,7 +49,7 @@ class PostController extends Controller
         //con esto creamos el slug de manera automatica
         $request->request->add(['slug'=>Str::slug($request->input('name'))]);
 
-        $request->validate([
+        $data=$request->validate([
 
             'name' => 'required|max:255',
             'slug' => 'required|max:255|unique:posts',
@@ -51,12 +57,14 @@ class PostController extends Controller
             'body' => 'required',
             //verificamos que existe el id en la categoria
             'category_id' => 'required|exists:categories,id',
-            'user_id' => 'required|exists:users,id',
-            
         ]);
 
+
+        $user = auth()->user();
+        $data['user_id']=$user->id;
+
         //creamos el registro de categoria
-        $post=Post::create($request->all());
+        $post=Post::create($data);
 
         return PostResource::make($post);
 

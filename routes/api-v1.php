@@ -9,6 +9,8 @@ use App\Http\Controllers\Api\RegisterController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\PostController;
 
+use App\Http\Controllers\Api\Auth\LoginController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -34,3 +36,6 @@ Route::delete('categories/{category}',[CategoryController::class,'destroy'])->na
 
 Route::apiResource('categories',CategoryController::class)->names('api.v1.categories');
 Route::apiResource('posts',PostController::class)->names('api.v1.posts');
+
+//ruta para el login
+Route::post('login',[LoginController::class,'store'])->name('api.v1.login');
